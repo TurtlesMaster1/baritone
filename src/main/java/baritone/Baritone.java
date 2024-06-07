@@ -1,4 +1,4 @@
-/*
+//*
  * This file is part of Baritone.
  *
  * Baritone is free software: you can redistribute it and/or modify
@@ -37,11 +37,16 @@ import baritone.utils.InputOverrideHandler;
 import baritone.utils.PathingControlManager;
 import baritone.utils.player.BaritonePlayerContext;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.SynchronousQueue;
@@ -50,7 +55,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
- * @author Brady
+ * Main Baritone class that handles core functionalities.
+ * 
+ * This class is responsible for initializing and managing various behaviors,
+ * processes, and other core components of Baritone.
+ * 
  * @since 7/31/2018
  */
 public class Baritone implements IBaritone {
@@ -90,7 +99,7 @@ public class Baritone implements IBaritone {
 
     public BlockStateInterface bsi;
 
-    Baritone(Minecraft mc) {
+    public Baritone(Minecraft mc) {
         this.mc = mc;
         this.gameEventHandler = new GameEventHandler(this);
 
@@ -261,4 +270,29 @@ public class Baritone implements IBaritone {
     public static Executor getExecutor() {
         return threadPool;
     }
+
+    public void attackEntities(String entityArg) {
+        List<Entity> entities = mc.world.getAllEntities();
+        for (Entity entity : entities) {
+            if (entity instanceof LivingEntity && entity != mc.player) {
+                LivingEntity livingEntity = (LivingEntity) entity;
+                if (shouldAttack(livingEntity, entityArg)) {
+                    mc.player.attack(entity);
+                    mc.player.swingHand(Hand.MAIN_HAND);
+                }
+            }
+        }
+    }
+
+    private boolean shouldAttack(LivingEntity entity, String entityArg) {
+        if (entityArg.equals("@e")) {
+            return true; // Attack all entities
+        } else if (entity instanceof PlayerEntity) {
+            return entity.getName().getString().equalsIgnoreCase(entityArg); // Attack specific player
+        } else {
+            Identifier id = Registry.ENTITY_TYPE.getId(entity.getType());
+            return id != null && id.toString().equals(entityArg); // Attack specific entity type
+        }
+    }
 }
+
