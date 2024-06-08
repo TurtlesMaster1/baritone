@@ -1,4 +1,4 @@
-//*
+/*
  * This file is part of Baritone.
  *
  * Baritone is free software: you can redistribute it and/or modify
@@ -55,12 +55,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
- * Main Baritone class that handles core functionalities.
- * 
- * This class is responsible for initializing and managing various behaviors,
- * processes, and other core components of Baritone.
- * 
- * @since 7/31/2018
+ * Author: Brady
+ * Since: 7/31/2018
  */
 public class Baritone implements IBaritone {
 
@@ -131,7 +127,7 @@ public class Baritone implements IBaritone {
             this.exploreProcess          = this.registerProcess(ExploreProcess::new);
             this.farmProcess             = this.registerProcess(FarmProcess::new);
             this.inventoryPauserProcess  = this.registerProcess(InventoryPauserProcess::new);
-            this.elytraProcess           = this.registerProcess(ElytraProcess::create);
+            this.elytraProcess           = this.registerProcess(IElytraProcess::create);
             this.registerProcess(BackfillProcess::new);
         }
 
@@ -295,4 +291,3 @@ public class Baritone implements IBaritone {
         }
     }
 }
-
